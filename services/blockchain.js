@@ -1,6 +1,7 @@
 const axios = require("axios");
 const getConfig = require("../utils/config");
 const { encryptString } = require("../utils/encryptDecrypt");
+const { producer } = require("../utils/kafkaSetup");
 const { getTransactionDetails } = require("../utils/wallet");
 
 const verifyOrderService = async ({ orderId, transactionHash }) => {
@@ -31,6 +32,11 @@ const verifyOrderService = async ({ orderId, transactionHash }) => {
 
     await axios.post(`${swapDexQuotationsUrl}/change-quotation-status`, {
       data: encryptData,
+    });
+
+    await producer.send({
+      topic: "send-txn",
+      messages: [{ value: orderId }],
     });
 
     return true;

@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const blockchain = require("./routes/blockchain");
 const getConfig = require("./utils/config");
 const logger = require("./utils/logger");
+const { producer } = require("./utils/kafkaSetup");
 
 const initRoutes = async (app) => {
   app.get("/health", async (req, res) => {
@@ -35,6 +36,7 @@ const connectToDB = async () => {
 
 const initialize = async (app) => {
   connectToDB(); // connecting to db
+  await producer.connect(); // connecting kafka queue
   await initRoutes(app); // initiating the routes of the application
   const port = await getConfig("port");
   app.listen(port, async () => {

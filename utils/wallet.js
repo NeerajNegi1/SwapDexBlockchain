@@ -1,12 +1,14 @@
 const { ethers } = require("ethers");
 const getConfig = require("./config");
 
-const connectToWallet = async () => {
+const connectToWallet = async (network) => {
+  if (network.includes("rinkeby")) {
+    network = await getConfig("rinkbyRpc");
+  }
+  let provider = ethers.getDefaultProvider(network);
   let privateKey = await getConfig("walletPrivateKey");
-  let wallet = new ethers.Wallet(privateKey);
-  let provider = ethers.getDefaultProvider();
-  let walletWithProvider = new ethers.Wallet(privateKey, provider);
-  return walletWithProvider;
+  let wallet = new ethers.Wallet(privateKey, provider);
+  return wallet;
 };
 
 const getProvider = async (rpcUrl) => {
@@ -25,4 +27,5 @@ const getTransactionDetails = async (rpcUrl, hash) => {
 
 module.exports = {
   getTransactionDetails,
+  connectToWallet,
 };
